@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Event Calendar Backend Data</title>
+  <style>
+    body { font-family: "Segoe UI", system-ui, sans-serif; background: #0b1026; color: #eef2ff; margin: 0; padding: 24px; }
+    h1 { margin: 0 0 4px; } p { opacity: .85; }
+    a { color: #7dd3fc; }
+    .bar { display: flex; gap: 10px; align-items: center; margin: 14px 0; flex-wrap: wrap; }
+    button { cursor: pointer; border: none; border-radius: 10px; padding: 8px 14px; background: #2563eb; color: #fff; font-weight: 600; }
+    .del { background: #ef4444; padding: 5px 10px; }
+    table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,.06); border-radius: 12px; overflow: hidden; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .92rem; vertical-align: top; }
+    th { background: rgba(255,255,255,.1); }
+    .mono { font-family: Consolas, monospace; font-size: .78rem; word-break: break-all; }
+    .empty { padding: 18px; opacity: .75; }
+    .pill { background: #14532d; color: #86efac; padding: 3px 10px; border-radius: 999px; font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Admin — Backend Data</h1>
+  <p>This page reads live from the backend API (<span class="mono">GET /api/events</span>) which reads from the
+     <strong>events</strong> collection in MongoDB. <a href="/">← Back to calendar</a></p>
+  <div class="bar">
+    <span class="pill" id="dbStatus">MongoDB: checking…</span>
+    <span id="count"></span>
+    <button onclick="load()">🔄 Refresh now</button>
+    <label><input type="checkbox" id="auto" checked /> Auto-refresh (5s)</label>
+  </div>
+  <div id="wrap"></div>
+  <script>
+    async function load() {
+      try {
+        const st = await (await fetch("/api/status")).json().catch(() => ({}));
+        const events = await (await fetch("/api/events")).json();
+        document.getElementById("dbStatus").textContent = st.storage === "MongoDB"
+          ? "MongoDB: connected ✅ (database: eventdb, collection: events)"
+          : "Storage: " + (st.storage || "unknown") + " (not MongoDB)";
+        document.getElementById("count").textContent = events.length + " event(s) stored";
+        if (!events.length) {
+          document.getElementById("wrap").innerHTML = '<div class="empty">No events in the database yet. Add one from the calendar page and it will appear here.</div>';
+          return;
+        }
+        let rows = events.map(e => `<tr>
+          <td class="mono">${e._id}</td><td><strong>${e.title || ""}</strong></td>
+          <td>${e.date || ""}</td><td>${e.time || "-"}</td><td>${e.category || ""}</td>
+          <td>${e.description || ""}</td><td class="mono">${e.createdAt || ""}</td>
+          <td><button class="del" onclick="del('${e._id}')">Delete</button></td></tr>`).join("");
+        document.getElementById("wrap").innerHTML =
+          `<table><tr><th>_id (MongoDB)</th><th>Title</th><th>Date</th><th>Time</th><th>Category</th><th>Description</th><th>Created At</th><th></th></tr>${rows}</table>`;
+      } catch (err) {
+        document.getElementById("dbStatus").textContent = "Backend not reachable ❌ — is the server running?";
+      }
+    }
+    async function del(id) {
+      if (!confirm("Delete this event from the database?")) return;
+      await fetch("/api/events/" + id, { method: "DELETE" });
+      load();
+    }
+    setInterval(() => { if (document.getElementById("auto").checked) load(); }, 5000);
+    load();
+  </script>
+</body>
+</html>
