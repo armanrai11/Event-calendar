@@ -65,6 +65,15 @@ Then open **http://localhost:3000** in your browser.
 3. **Fallback:** if MongoDB cannot be reached, the server automatically uses a temporary
    in-memory list so the demo never crashes (data resets when the server restarts).
 
+## Login system
+
+- Open **http://localhost:3000/login.html** to **Login** or **Register**.
+- Accounts are stored in MongoDB (database **eventdb**, collection **users**) with
+  passwords hashed using bcrypt — you can see the records in MongoDB Compass.
+- API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
+  (header `x-auth-token`). After login the home page greets you by name with a
+  Logout button.
+
 ## See the backend data (Admin)
 
 - **Admin page:** open **http://localhost:3000/admin.html** — a live table of everything

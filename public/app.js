@@ -129,3 +129,23 @@ card.addEventListener("mouseleave", () => (card.style.transform = ""));
 })();
 
 loadEvents();
+
+// ---------- Auth state in the header (login/logout) ----------
+(function initAuthBar() {
+  const who = document.getElementById("whoami");
+  const loginLink = document.getElementById("loginLink");
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!who || !loginLink || !logoutBtn) return;
+  const user = localStorage.getItem("ec_user");
+  const token = localStorage.getItem("ec_token");
+  if (user && token) {
+    who.textContent = "👋 Hi, " + user;
+    loginLink.hidden = true;
+    logoutBtn.hidden = false;
+  }
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("ec_user");
+    localStorage.removeItem("ec_token");
+    location.reload();
+  });
+})();

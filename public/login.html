@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Event Calendar 3D</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .auth-wrap { max-width: 420px; margin: 40px auto; padding: 0 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .tabs button { flex: 1; background: rgba(255,255,255,.12); color: #fff; font-weight: 600; }
+    .tabs button.active { background: #2563eb; }
+    .err { color: #fca5a5; min-height: 1.2em; }
+    .back { display: inline-block; margin-top: 12px; color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📅 Event Calendar <span>3D</span></h1>
+    <p>Login to continue — your account is stored in MongoDB.</p>
+  </header>
+
+  <div class="auth-wrap">
+    <section class="card">
+      <div class="tabs">
+        <button id="tabLogin" class="active" type="button">Login</button>
+        <button id="tabRegister" type="button">Register</button>
+      </div>
+      <form id="authForm">
+        <label>Username <input id="username" required minlength="3" placeholder="e.g. arman" autocomplete="username" /></label>
+        <label>Password <input id="password" type="password" required minlength="4" placeholder="••••••" autocomplete="current-password" /></label>
+        <button class="primary" type="submit" id="submitBtn">Login</button>
+      </form>
+      <p id="msg" class="status"></p>
+      <p id="err" class="err"></p>
+      <a class="back" href="/">← Back to calendar</a>
+    </section>
+  </div>
+
+  <script>
+    let mode = "login";
+    const tabLogin = document.getElementById("tabLogin");
+    const tabRegister = document.getElementById("tabRegister");
+    const submitBtn = document.getElementById("submitBtn");
+    const msg = document.getElementById("msg");
+    const err = document.getElementById("err");
+
+    function setMode(m) {
+      mode = m;
+      tabLogin.classList.toggle("active", m === "login");
+      tabRegister.classList.toggle("active", m === "register");
+      submitBtn.textContent = m === "login" ? "Login" : "Create account";
+      msg.textContent = ""; err.textContent = "";
+    }
+    tabLogin.onclick = () => setMode("login");
+    tabRegister.onclick = () => setMode("register");
+
+    document.getElementById("authForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      err.textContent = ""; msg.textContent = "";
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      try {
+        const res = await fetch("/api/auth/" + mode, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Something went wrong");
+        localStorage.setItem("ec_token", data.token);
+        localStorage.setItem("ec_user", data.username);
+        msg.textContent = (mode === "login" ? "Welcome back, " : "Account created, ") + data.username + "! Redirecting...";
+        setTimeout(() => (location.href = "/"), 700);
+      } catch (ex) { err.textContent = ex.message; }
+    });
+  </script>
+</body>
+</html>

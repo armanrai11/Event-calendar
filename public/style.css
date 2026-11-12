@@ -44,3 +44,6 @@ input, select, textarea { padding: 9px; border-radius: 10px; border: 1px solid r
 .editBtn { background: #f59e0b; color: #111; }
 .delBtn { background: #ef4444; color: #fff; }
 .empty { opacity: .7; }
+.authbar { margin-top: 10px; display: flex; gap: 10px; justify-content: center; align-items: center; }
+.authbar a.badge { color: #fff; text-decoration: none; }
+#whoami { font-weight: 600; color: #86efac; }
