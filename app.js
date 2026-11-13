@@ -24,6 +24,9 @@ const User = require("./models/User");
 const app = express();
 app.use(cors());
 app.use(express.json());
+// Serve the homepage explicitly (some serverless routers mishandle
+// express.static for the bare "/" path - sendFile is unambiguous).
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 app.use(express.static(path.join(__dirname, "public"))); // serve the website
 
 let useMongo = false;
