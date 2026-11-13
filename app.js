@@ -65,26 +65,38 @@ async function ensureConnected() {
 }
 
 const store = {
-  async create(data) {
-    if (useMongo) return Event.create(data);
-    const event = { _id: memId(), category: "Other", time: "", description: "", ...data };
+  async create(data, username) {
+    const clean = { ...data }; delete clean.username;
+    if (useMongo) return Event.create({ ...clean, username });
+    const event = { _id: memId(), category: "Other", time: "", description: "", ...clean, username };
     mem.push(event); return event;
   },
-  async all() {
+  async all(username) {
+    if (useMongo) return Event.find({ username }).sort({ date: 1, time: 1 });
+    return mem.filter((e) => e.username === username).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  },
+  async allAdmin() {
     if (useMongo) return Event.find().sort({ date: 1, time: 1 });
     return [...mem].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   },
-  async one(id) {
-    if (useMongo) return Event.findById(id);
-    return mem.find((e) => e._id === id) || null;
+  async one(id, username) {
+    if (useMongo) return Event.findOne({ _id: id, username });
+    return mem.find((e) => e._id === id && e.username === username) || null;
   },
-  async update(id, data) {
-    if (useMongo) return Event.findByIdAndUpdate(id, data, { new: true, runValidators: true });
-    const e = mem.find((x) => x._id === id);
+  async update(id, data, username) {
+    const clean = { ...data }; delete clean.username;
+    if (useMongo) return Event.findOneAndUpdate({ _id: id, username }, clean, { new: true, runValidators: true });
+    const e = mem.find((x) => x._id === id && x.username === username);
     if (!e) return null;
-    Object.assign(e, data); return e;
+    Object.assign(e, clean); return e;
   },
-  async remove(id) {
+  async remove(id, username) {
+    if (useMongo) return Event.findOneAndDelete({ _id: id, username });
+    const i = mem.findIndex((x) => x._id === id && x.username === username);
+    if (i === -1) return null;
+    return mem.splice(i, 1)[0];
+  },
+  async removeAny(id) {
     if (useMongo) return Event.findByIdAndDelete(id);
     const i = mem.findIndex((x) => x._id === id);
     if (i === -1) return null;
@@ -128,6 +140,14 @@ const userStore = {
   },
 };
 
+// Middleware: event APIs are login-only (login first, then use the website)
+async function requireAuth(req, res, next) {
+  const user = await userStore.byToken(req.headers["x-auth-token"]);
+  if (!user) return res.status(401).json({ error: "Login required" });
+  req.user = user;
+  next();
+}
+
 app.post("/api/auth/register", async (req, res) => {
   try {
     const username = String(req.body.username || "").trim().toLowerCase();
@@ -158,32 +178,40 @@ app.get("/api/auth/me", async (req, res) => {
   res.json({ username: user.username });
 });
 
-app.post("/api/events", async (req, res) => {
+app.post("/api/events", requireAuth, async (req, res) => {
   try {
     if (!req.body.title || !req.body.date)
       return res.status(400).json({ error: "title and date are required" });
-    res.status(201).json(await store.create(req.body));
+    res.status(201).json(await store.create(req.body, req.user.username));
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.get("/api/events", async (req, res) => res.json(await store.all()));
+app.get("/api/admin/events", requireAuth, async (req, res) => res.json(await store.allAdmin()));
 
-app.get("/api/events/:id", async (req, res) => {
-  const event = await store.one(req.params.id).catch(() => null);
+app.delete("/api/admin/events/:id", requireAuth, async (req, res) => {
+  const event = await store.removeAny(req.params.id).catch(() => null);
+  if (!event) return res.status(404).json({ error: "Event not found" });
+  res.json({ message: "Event deleted" });
+});
+
+app.get("/api/events", requireAuth, async (req, res) => res.json(await store.all(req.user.username)));
+
+app.get("/api/events/:id", requireAuth, async (req, res) => {
+  const event = await store.one(req.params.id, req.user.username).catch(() => null);
   if (!event) return res.status(404).json({ error: "Event not found" });
   res.json(event);
 });
 
-app.put("/api/events/:id", async (req, res) => {
+app.put("/api/events/:id", requireAuth, async (req, res) => {
   try {
-    const event = await store.update(req.params.id, req.body);
+    const event = await store.update(req.params.id, req.body, req.user.username);
     if (!event) return res.status(404).json({ error: "Event not found" });
     res.json(event);
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.delete("/api/events/:id", async (req, res) => {
-  const event = await store.remove(req.params.id).catch(() => null);
+app.delete("/api/events/:id", requireAuth, async (req, res) => {
+  const event = await store.remove(req.params.id, req.user.username).catch(() => null);
   if (!event) return res.status(404).json({ error: "Event not found" });
   res.json({ message: "Event deleted" });
 });

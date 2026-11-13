@@ -12,6 +12,7 @@ const eventSchema = new mongoose.Schema(
       default: "Other",
     },
     description: { type: String, default: "" },
+    username: { type: String, default: "" }, // owner: each user sees only their own events
   },
   { timestamps: true }
 );

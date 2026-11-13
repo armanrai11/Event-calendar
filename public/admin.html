@@ -21,7 +21,7 @@
 </head>
 <body>
   <h1>🛠️ Admin — Backend Data</h1>
-  <p>This page reads live from the backend API (<span class="mono">GET /api/events</span>) which reads from the
+  <p>This page reads live from the backend API (<span class="mono">GET /api/admin/events</span>) which reads from the
      <strong>events</strong> collection in MongoDB. <a href="/">← Back to calendar</a></p>
   <div class="bar">
     <span class="pill" id="dbStatus">MongoDB: checking…</span>
@@ -31,10 +31,15 @@
   </div>
   <div id="wrap"></div>
   <script>
+    const TOKEN = localStorage.getItem("ec_token");
+    if (!TOKEN) location.replace("/login.html"); // login first
+    const H = () => ({ "x-auth-token": localStorage.getItem("ec_token") || "" });
     async function load() {
       try {
         const st = await (await fetch("/api/status")).json().catch(() => ({}));
-        const events = await (await fetch("/api/events")).json();
+        const evRes = await fetch("/api/admin/events", { headers: H() });
+        if (evRes.status === 401) { location.replace("/login.html"); return; }
+        const events = await evRes.json();
         document.getElementById("dbStatus").textContent = st.storage === "MongoDB"
           ? "MongoDB: connected ✅ (database: eventdb, collection: events)"
           : "Storage: " + (st.storage || "unknown") + " (not MongoDB)";
@@ -45,18 +50,18 @@
         }
         let rows = events.map(e => `<tr>
           <td class="mono">${e._id}</td><td><strong>${e.title || ""}</strong></td>
-          <td>${e.date || ""}</td><td>${e.time || "-"}</td><td>${e.category || ""}</td>
+          <td>${e.date || ""}</td><td>${e.time || "-"}</td><td>${e.category || ""}</td><td>${e.username || "-"}</td>
           <td>${e.description || ""}</td><td class="mono">${e.createdAt || ""}</td>
           <td><button class="del" onclick="del('${e._id}')">Delete</button></td></tr>`).join("");
         document.getElementById("wrap").innerHTML =
-          `<table><tr><th>_id (MongoDB)</th><th>Title</th><th>Date</th><th>Time</th><th>Category</th><th>Description</th><th>Created At</th><th></th></tr>${rows}</table>`;
+          `<table><tr><th>_id (MongoDB)</th><th>Title</th><th>Date</th><th>Time</th><th>Category</th><th>Owner</th><th>Description</th><th>Created At</th><th></th></tr>${rows}</table>`;
       } catch (err) {
         document.getElementById("dbStatus").textContent = "Backend not reachable ❌ — is the server running?";
       }
     }
     async function del(id) {
       if (!confirm("Delete this event from the database?")) return;
-      await fetch("/api/events/" + id, { method: "DELETE" });
+      await fetch("/api/admin/events/" + id, { method: "DELETE", headers: H() });
       load();
     }
     setInterval(() => { if (document.getElementById("auto").checked) load(); }, 5000);

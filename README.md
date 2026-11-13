@@ -68,6 +68,9 @@ Then open **http://localhost:3000** in your browser.
 ## Login system
 
 - Open **http://localhost:3000/login.html** to **Login** or **Register**.
+- **Login is compulsory and comes first:** opening the calendar without an account
+  sends you to the login page. Events are **individual** — every user sees and
+  manages only their own events. The Admin page (after login) shows all records.
 - Accounts are stored in MongoDB (database **eventdb**, collection **users**) with
   passwords hashed using bcrypt — you can see the records in MongoDB Compass.
 - API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`

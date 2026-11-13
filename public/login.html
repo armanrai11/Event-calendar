@@ -38,6 +38,7 @@
   </div>
 
   <script>
+    if (localStorage.getItem("ec_token")) location.replace("/"); // already logged in
     let mode = "login";
     const tabLogin = document.getElementById("tabLogin");
     const tabRegister = document.getElementById("tabRegister");

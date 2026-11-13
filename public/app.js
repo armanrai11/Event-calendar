@@ -6,6 +6,9 @@
 //  DELETE -> DELETE  /api/events/:id
 // ============================================================
 const API = "/api/events";
+const TOKEN = localStorage.getItem("ec_token");
+if (!TOKEN) location.replace("/login.html"); // login first, then use the website
+const authHeaders = () => ({ "x-auth-token": localStorage.getItem("ec_token") || "" });
 let events = [];
 let view = new Date(); view.setDate(1);
 
@@ -19,7 +22,12 @@ const iso = (d) => d.toISOString().slice(0, 10);
 
 // ---------- READ all events, then draw ----------
 async function loadEvents() {
-  events = await (await fetch(API)).json();
+  const res = await fetch(API, { headers: authHeaders() });
+  if (res.status === 401) { // session missing/expired -> back to login
+    localStorage.removeItem("ec_token"); localStorage.removeItem("ec_user");
+    location.replace("/login.html"); return;
+  }
+  events = await res.json();
   drawCalendar(); drawList();
 }
 
@@ -64,7 +72,7 @@ form.addEventListener("submit", async (ev) => {
     category: $("category").value, description: $("description").value };
   const id = $("eventId").value;
   const res = await fetch(id ? `${API}/${id}` : API,
-    { method: id ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    { method: id ? "PUT" : "POST", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify(data) });
   statusEl.textContent = res.ok ? (id ? "✅ Event updated!" : "✅ Event added!") : "❌ Something went wrong";
   resetForm(); loadEvents();
 });
@@ -84,7 +92,7 @@ $("cancelEdit").onclick = resetForm;
 // ---------- DELETE ----------
 async function removeEvent(id) {
   if (!confirm("Delete this event?")) return;
-  await fetch(`${API}/${id}`, { method: "DELETE" });
+  await fetch(`${API}/${id}`, { method: "DELETE", headers: authHeaders() });
   statusEl.textContent = "🗑️ Event deleted"; loadEvents();
 }
 
@@ -146,6 +154,6 @@ loadEvents();
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("ec_user");
     localStorage.removeItem("ec_token");
-    location.reload();
+    location.href = "/login.html";
   });
 })();
