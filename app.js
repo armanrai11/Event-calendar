@@ -133,6 +133,12 @@ const userStore = {
     const user = { _id: memId(), username, passwordHash, token };
     memUsers.push(user); return user;
   },
+  // List registered users for the admin page. Only username + signup date:
+  // passwordHash and token are NEVER returned.
+  async allUsers() {
+    if (useMongo) return User.find({}, "username createdAt").sort({ createdAt: 1 }).lean();
+    return memUsers.map((u) => ({ username: u.username, createdAt: u.createdAt || "" }));
+  },
   async setToken(user, token) {
     user.token = token;
     if (useMongo) await user.save();
@@ -187,6 +193,8 @@ app.post("/api/events", requireAuth, async (req, res) => {
 });
 
 app.get("/api/admin/events", requireAuth, async (req, res) => res.json(await store.allAdmin()));
+
+app.get("/api/admin/users", requireAuth, async (req, res) => res.json(await userStore.allUsers()));
 
 app.delete("/api/admin/events/:id", requireAuth, async (req, res) => {
   const event = await store.removeAny(req.params.id).catch(() => null);

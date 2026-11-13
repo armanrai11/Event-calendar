@@ -29,6 +29,10 @@
     <button onclick="load()">🔄 Refresh now</button>
     <label><input type="checkbox" id="auto" checked /> Auto-refresh (5s)</label>
   </div>
+  <h2>Registered users</h2>
+  <p style="font-size:.85rem">Usernames only — passwords are bcrypt-hashed and can never be shown.</p>
+  <div id="usersWrap"></div>
+  <h2>All events</h2>
   <div id="wrap"></div>
   <script>
     const TOKEN = localStorage.getItem("ec_token");
@@ -40,6 +44,11 @@
         const evRes = await fetch("/api/admin/events", { headers: H() });
         if (evRes.status === 401) { location.replace("/login.html"); return; }
         const events = await evRes.json();
+        const users = await (await fetch("/api/admin/users", { headers: H() })).json().catch(() => []);
+        document.getElementById("usersWrap").innerHTML = users.length
+          ? `<table><tr><th>Username</th><th>Registered</th></tr>` +
+            users.map(u => `<tr><td><strong>${u.username || ""}</strong></td><td>${u.createdAt || "-"}</td></tr>`).join("") + `</table>`
+          : '<div class="empty">No registered users yet.</div>';
         document.getElementById("dbStatus").textContent = st.storage === "MongoDB"
           ? "MongoDB: connected ✅ (database: eventdb, collection: events)"
           : "Storage: " + (st.storage || "unknown") + " (not MongoDB)";
