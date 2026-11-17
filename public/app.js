@@ -40,12 +40,17 @@ function drawCalendar() {
   for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="day dim"></div>`;
   for (let d = 1; d <= days; d++) {
     const dateStr = iso(new Date(y, m, d));
-    const has = events.some((e) => e.date === dateStr);
+    const cats = [...new Set(events.filter((e) => e.date === dateStr).map((e) => (e.category || "Other").toLowerCase()))].slice(0, 3);
     const today = dateStr === iso(new Date()) ? " today" : "";
-    grid.innerHTML += `<div class="day${today}" data-date="${dateStr}">${d}${has ? '<span class="dot"></span>' : ""}</div>`;
+    const dots = cats.length ? `<span class="dots">${cats.map((c) => `<span class="dot cat-${c}"></span>`).join("")}</span>` : "";
+    grid.innerHTML += `<div class="day${today}" data-date="${dateStr}">${d}${dots}</div>`;
   }
   grid.querySelectorAll(".day[data-date]").forEach((el) =>
-    el.addEventListener("click", () => { $("date").value = el.dataset.date; $("title").focus(); })
+    el.addEventListener("click", () => {
+      grid.querySelectorAll(".day.selected").forEach((x) => x.classList.remove("selected"));
+      el.classList.add("selected");
+      $("date").value = el.dataset.date; $("title").focus();
+    })
   );
 }
 
@@ -55,8 +60,9 @@ function drawList(filter = "") {
   listEl.innerHTML = items.length ? "" : `<p class="empty">No events yet. Add your first event above!</p>`;
   items.forEach((e) => {
     const div = document.createElement("div");
-    div.className = "event";
-    div.innerHTML = `<div><strong>${e.title}</strong><span class="badge">${e.category}</span><br>
+    const slug = (e.category || "Other").toLowerCase();
+    div.className = "event cat-" + slug;
+    div.innerHTML = `<div><strong>${e.title}</strong><span class="badge cat-${slug}">${e.category}</span><br>
       <small>${e.date}${e.time ? " · " + e.time : ""}</small><br><small>${e.description || ""}</small></div>
       <div class="actions"><button class="editBtn">Edit</button><button class="delBtn">Delete</button></div>`;
     div.querySelector(".editBtn").onclick = () => fillForm(e);
