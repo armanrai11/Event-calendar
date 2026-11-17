@@ -1,49 +1,57 @@
-* { box-sizing: border-box; font-family: "Segoe UI", system-ui, sans-serif; }
-body { margin: 0; color: #eef2ff; background: #0b1026; min-height: 100vh; }
-#bg3d { position: fixed; inset: 0; z-index: -1; }
-header { text-align: center; padding: 28px 16px 4px; }
-header h1 { margin: 0; font-size: 2.2rem; }
-header h1 span { color: #7dd3fc; text-shadow: 0 0 18px #38bdf8; }
-header p { opacity: .85; }
-main { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; max-width: 1100px; margin: 18px auto; padding: 0 16px; }
+/* theme: clean-light-v1 — simple, professional light theme */
+* { box-sizing: border-box; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #1f2937; background: #f6f7f9; min-height: 100vh; }
+
+header { background: #ffffff; border-bottom: 1px solid #e5e7eb; padding: 20px 16px 16px; text-align: center; }
+header h1 { margin: 0; font-size: 1.6rem; font-weight: 650; color: #111827; letter-spacing: -0.01em; }
+header h1 span { color: #2563eb; text-shadow: none; }
+header p { margin: 6px 0 0; color: #6b7280; font-size: .95rem; }
+
+main { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; max-width: 1100px; margin: 22px auto; padding: 0 16px; }
 @media (max-width: 850px) { main { grid-template-columns: 1fr; } }
 
-/* Glass card + 3D tilt */
-.card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-  border-radius: 16px; padding: 18px; backdrop-filter: blur(8px);
-  box-shadow: 0 18px 40px rgba(0,0,0,.45); transform-style: preserve-3d;
-  transition: transform .15s ease; }
+.card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;
+  box-shadow: 0 1px 3px rgba(16,24,40,.05); }
 .card.wide { max-width: 1100px; margin: 0 auto 30px; }
-.tilt { will-change: transform; }
+.card h2 { margin-top: 0; font-size: 1.15rem; color: #111827; }
 
 .cal-head { display: flex; justify-content: space-between; align-items: center; }
-.cal-head button, button { cursor: pointer; border: none; border-radius: 10px; padding: 8px 14px; }
+.cal-head h2 { margin: 0; }
+.cal-head button, button { cursor: pointer; border: 1px solid #d1d5db; background: #ffffff; color: #111827;
+  border-radius: 8px; padding: 8px 14px; font-size: .92rem; }
+.cal-head button:hover, button:hover { background: #f3f4f6; }
 .weekdays, .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-.weekdays { margin: 12px 0 6px; font-weight: 600; opacity: .8; }
-.day { padding: 10px 4px; border-radius: 10px; background: rgba(255,255,255,.06); cursor: pointer; position: relative; }
-.day:hover { background: rgba(125,211,252,.35); transform: translateY(-2px); }
-.day.today { outline: 2px solid #7dd3fc; }
-.day.dim { opacity: .3; cursor: default; }
-.dot { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: #facc15; }
-.hint { opacity: .75; font-size: .9rem; }
+.weekdays { margin: 14px 0 6px; font-weight: 600; color: #6b7280; font-size: .85rem; text-transform: uppercase; }
+.day { padding: 10px 4px; border-radius: 8px; background: #ffffff; border: 1px solid #eef0f3; cursor: pointer; position: relative; color: #1f2937; }
+.day:hover { background: #eff6ff; border-color: #bfdbfe; }
+.day.today { background: #2563eb; color: #ffffff; border-color: #2563eb; font-weight: 600; }
+.day.dim { opacity: .3; cursor: default; border-color: transparent; }
+.dot { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: #2563eb; }
+.day.today .dot { background: #ffffff; }
+.hint { color: #6b7280; font-size: .9rem; margin-bottom: 0; }
 
 form { display: grid; gap: 10px; }
-label { display: grid; gap: 4px; font-size: .95rem; }
-input, select, textarea { padding: 9px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.35); color: #fff; width: 100%; }
+label { display: grid; gap: 4px; font-size: .95rem; color: #374151; }
+input, select, textarea { padding: 9px 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; color: #111827; width: 100%; font-size: .95rem; }
+input:focus, select:focus, textarea:focus { outline: 2px solid #bfdbfe; border-color: #2563eb; }
 .row { display: flex; gap: 10px; }
-.primary { background: #2563eb; color: #fff; font-weight: 600; }
-.ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); }
-.status { min-height: 1.2em; color: #86efac; }
+.primary { background: #2563eb; border-color: #2563eb; color: #ffffff; font-weight: 600; }
+.primary:hover { background: #1d4ed8; }
+.ghost { background: #ffffff; color: #111827; border: 1px solid #d1d5db; }
+.status { min-height: 1.2em; color: #15803d; }
 
 .event-list { display: grid; gap: 10px; margin-top: 12px; }
 .event { display: flex; justify-content: space-between; gap: 12px; align-items: center;
-  background: rgba(255,255,255,.07); border-radius: 12px; padding: 12px 14px; }
-.event small { opacity: .8; }
-.badge { font-size: .75rem; padding: 2px 8px; border-radius: 999px; background: #334155; margin-left: 6px; }
+  background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; }
+.event small { color: #6b7280; }
+.badge { font-size: .75rem; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #334155; margin-left: 6px; }
 .event .actions button { margin-left: 6px; }
-.editBtn { background: #f59e0b; color: #111; }
-.delBtn { background: #ef4444; color: #fff; }
-.empty { opacity: .7; }
-.authbar { margin-top: 10px; display: flex; gap: 10px; justify-content: center; align-items: center; }
-.authbar a.badge { color: #fff; text-decoration: none; }
-#whoami { font-weight: 600; color: #86efac; }
+.editBtn { background: #fff7ed; color: #b45309; border: 1px solid #fed7aa; }
+.editBtn:hover { background: #ffedd5; }
+.delBtn { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.delBtn:hover { background: #fee2e2; }
+.empty { color: #6b7280; }
+.authbar { margin-top: 12px; display: flex; gap: 10px; justify-content: center; align-items: center; }
+.authbar a.badge { background: #ffffff; border: 1px solid #d1d5db; color: #111827; text-decoration: none; padding: 6px 12px; font-size: .85rem; margin-left: 0; }
+.authbar a.badge:hover { background: #f3f4f6; }
+#whoami { font-weight: 600; color: #111827; }
