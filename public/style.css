@@ -1,4 +1,4 @@
-/* theme: modern-app-v2 — clean light app theme with category colours */
+/* theme: modern-app-v3 — clean light app theme with category colours */
 * { box-sizing: border-box; font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; }
 body { margin: 0; color: #1f2937; background: #f7f8fa; min-height: 100vh; }
 
@@ -65,7 +65,8 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb
 .delBtn { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 .delBtn:hover { background: #fee2e2; }
 .empty { color: #6b7280; }
-.authbar { margin-top: 14px; display: flex; gap: 10px; justify-content: center; align-items: center; }
+.authbar { position: absolute; top: 14px; right: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 720px) { .authbar { position: static; justify-content: center; margin-top: 12px; } }
 .authbar a.badge { background: #ffffff; border: 1px solid #d1d5db; color: #111827; text-decoration: none; padding: 7px 14px; font-size: .85rem; margin-left: 0; }
 .authbar a.badge:hover { background: #f3f4f6; }
 #whoami { font-weight: 600; color: #111827; }

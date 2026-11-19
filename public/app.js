@@ -118,7 +118,8 @@ loadEvents();
   const user = localStorage.getItem("ec_user");
   const token = localStorage.getItem("ec_token");
   if (user && token) {
-    who.textContent = "Hi, " + user;
+    const displayName = user.includes("@") ? user.split("@")[0] : user;
+    who.textContent = "Hi, " + displayName;
     loginLink.hidden = true;
     logoutBtn.hidden = false;
   }
