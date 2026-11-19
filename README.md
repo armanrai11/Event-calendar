@@ -3,6 +3,16 @@
 An interactive event calendar website with a **3D look**, a **Node.js + Express backend**,
 **MongoDB database**, and **full CRUD operations**.
 
+## Team
+
+This project is built by a team of three:
+
+| Member | GitHub |
+|--------|--------|
+| Arman Rai | [@armanrai11](https://github.com/armanrai11) |
+| Daksh Saini | [@dakshsainihlo-hub](https://github.com/dakshsainihlo-hub) |
+| Ayush | [@ayush-sharma0403](https://github.com/ayush-sharma0403) |
+
 ## Simple explanation (for viva / presentation)
 
 > "This is a full-stack web app. The **frontend** (HTML, CSS, JavaScript) shows a monthly
