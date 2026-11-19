@@ -18,7 +18,9 @@ const listEl = document.getElementById("eventList");
 const form = document.getElementById("eventForm");
 const statusEl = document.getElementById("status");
 const $ = (id) => document.getElementById(id);
-const iso = (d) => d.toISOString().slice(0, 10);
+// Format a date as YYYY-MM-DD using LOCAL time. (toISOString() is UTC —
+// in IST it turned midnight of the 24th into the 23rd, an off-by-one bug.)
+const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 
 // ---------- READ all events, then draw ----------
 async function loadEvents() {
