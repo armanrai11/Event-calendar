@@ -28,6 +28,14 @@
         <h2 id="monthLabel"></h2>
         <button id="nextBtn">▶</button>
       </div>
+      <div id="monthPicker" class="month-picker" hidden>
+        <div class="mp-year">
+          <button type="button" id="mpPrevYear">◀</button>
+          <span id="mpYearLabel"></span>
+          <button type="button" id="mpNextYear">▶</button>
+        </div>
+        <div class="mp-grid" id="mpGrid"></div>
+      </div>
       <div class="weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
       <div class="grid" id="calendarGrid"></div>
       <p class="hint">Click any date to add an event on that day.</p>

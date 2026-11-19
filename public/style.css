@@ -1,4 +1,4 @@
-/* theme: modern-app-v3 — clean light app theme with category colours */
+/* theme: modern-app-v4 — clean light app theme with category colours */
 * { box-sizing: border-box; font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; }
 body { margin: 0; color: #1f2937; background: #f7f8fa; min-height: 100vh; }
 
@@ -70,3 +70,10 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb
 .authbar a.badge { background: #ffffff; border: 1px solid #d1d5db; color: #111827; text-decoration: none; padding: 7px 14px; font-size: .85rem; margin-left: 0; }
 .authbar a.badge:hover { background: #f3f4f6; }
 #whoami { font-weight: 600; color: #111827; }
+#monthLabel { cursor: pointer; }
+#monthLabel::after { content: " ▾"; font-size: .75em; color: #6b7280; }
+.month-picker { margin-top: 14px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fbfbfc; }
+.mp-year { display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #111827; margin-bottom: 10px; }
+.mp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.mp-grid button.active { background: #2563eb; border-color: #2563eb; color: #ffffff; font-weight: 600; }
+.mp-grid button.active:hover { background: #1d4ed8; }

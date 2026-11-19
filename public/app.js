@@ -109,6 +109,36 @@ $("prevBtn").onclick = () => { view.setMonth(view.getMonth() - 1); drawCalendar(
 $("nextBtn").onclick = () => { view.setMonth(view.getMonth() + 1); drawCalendar(); };
 $("search").addEventListener("input", (e) => drawList(e.target.value));
 
+// ---------- Month/year picker: click the month title to jump anywhere ----------
+const picker = $("monthPicker");
+const mpGrid = $("mpGrid");
+const mpYearLabel = $("mpYearLabel");
+let pickerYear = view.getFullYear();
+const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function renderPicker() {
+  mpYearLabel.textContent = pickerYear;
+  mpGrid.innerHTML = "";
+  MONTHS_SHORT.forEach((name, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = name;
+    if (pickerYear === view.getFullYear() && idx === view.getMonth()) b.className = "active";
+    b.onclick = () => {
+      view.setFullYear(pickerYear); view.setMonth(idx); view.setDate(1);
+      picker.hidden = true;
+      drawCalendar();
+    };
+    mpGrid.appendChild(b);
+  });
+}
+monthLabel.addEventListener("click", () => {
+  pickerYear = view.getFullYear();
+  renderPicker();
+  picker.hidden = !picker.hidden;
+});
+$("mpPrevYear").onclick = () => { pickerYear--; renderPicker(); };
+$("mpNextYear").onclick = () => { pickerYear++; renderPicker(); };
+
 loadEvents();
 
 // ---------- Auth state in the header (login/logout) ----------
