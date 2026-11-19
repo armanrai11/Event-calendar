@@ -125,7 +125,7 @@ loadEvents();
     logoutBtn.hidden = false;
     // Admin panel is only shown to the site owner's accounts
     // (the server also enforces this — hiding alone would not be enough).
-    const ADMIN_USERS = ["arman", "4617arman@gmail.com"];
+    const ADMIN_USERS = ["4617arman@gmail.com"];
     if (adminLink) adminLink.hidden = !ADMIN_USERS.includes(user.toLowerCase());
   }
   logoutBtn.addEventListener("click", () => {

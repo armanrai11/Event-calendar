@@ -156,7 +156,7 @@ async function requireAuth(req, res, next) {
 
 // Admin-only routes: only the site owner's accounts may use the admin panel.
 // The list can be changed any time with the ADMIN_USERS env var (comma-separated).
-const ADMIN_USERS = (process.env.ADMIN_USERS || "arman,4617arman@gmail.com")
+const ADMIN_USERS = (process.env.ADMIN_USERS || "4617arman@gmail.com")
   .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 async function requireAdmin(req, res, next) {
   const user = await userStore.byToken(req.headers["x-auth-token"]);
