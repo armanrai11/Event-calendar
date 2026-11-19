@@ -154,6 +154,19 @@ async function requireAuth(req, res, next) {
   next();
 }
 
+// Admin-only routes: only the site owner's accounts may use the admin panel.
+// The list can be changed any time with the ADMIN_USERS env var (comma-separated).
+const ADMIN_USERS = (process.env.ADMIN_USERS || "arman,4617arman@gmail.com")
+  .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+async function requireAdmin(req, res, next) {
+  const user = await userStore.byToken(req.headers["x-auth-token"]);
+  if (!user) return res.status(401).json({ error: "Login required" });
+  if (!ADMIN_USERS.includes(String(user.username).toLowerCase()))
+    return res.status(403).json({ error: "Admins only" });
+  req.user = user;
+  next();
+}
+
 app.post("/api/auth/register", async (req, res) => {
   try {
     const username = String(req.body.username || "").trim().toLowerCase();
@@ -192,11 +205,11 @@ app.post("/api/events", requireAuth, async (req, res) => {
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.get("/api/admin/events", requireAuth, async (req, res) => res.json(await store.allAdmin()));
+app.get("/api/admin/events", requireAdmin, async (req, res) => res.json(await store.allAdmin()));
 
-app.get("/api/admin/users", requireAuth, async (req, res) => res.json(await userStore.allUsers()));
+app.get("/api/admin/users", requireAdmin, async (req, res) => res.json(await userStore.allUsers()));
 
-app.delete("/api/admin/events/:id", requireAuth, async (req, res) => {
+app.delete("/api/admin/events/:id", requireAdmin, async (req, res) => {
   const event = await store.removeAny(req.params.id).catch(() => null);
   if (!event) return res.status(404).json({ error: "Event not found" });
   res.json({ message: "Event deleted" });

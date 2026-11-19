@@ -114,6 +114,7 @@ loadEvents();
   const who = document.getElementById("whoami");
   const loginLink = document.getElementById("loginLink");
   const logoutBtn = document.getElementById("logoutBtn");
+  const adminLink = document.getElementById("adminLink");
   if (!who || !loginLink || !logoutBtn) return;
   const user = localStorage.getItem("ec_user");
   const token = localStorage.getItem("ec_token");
@@ -122,6 +123,10 @@ loadEvents();
     who.textContent = "Hi, " + displayName;
     loginLink.hidden = true;
     logoutBtn.hidden = false;
+    // Admin panel is only shown to the site owner's accounts
+    // (the server also enforces this — hiding alone would not be enough).
+    const ADMIN_USERS = ["arman", "4617arman@gmail.com"];
+    if (adminLink) adminLink.hidden = !ADMIN_USERS.includes(user.toLowerCase());
   }
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("ec_user");

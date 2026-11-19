@@ -43,6 +43,13 @@
         const st = await (await fetch("/api/status")).json().catch(() => ({}));
         const evRes = await fetch("/api/admin/events", { headers: H() });
         if (evRes.status === 401) { location.replace("/login.html"); return; }
+        if (evRes.status === 403) {
+          document.getElementById("dbStatus").textContent = "Admins only";
+          document.getElementById("count").textContent = "";
+          document.getElementById("usersWrap").innerHTML = '<div class="empty">This page is for admins only. You are logged in as a regular user.</div>';
+          document.getElementById("wrap").innerHTML = "";
+          return;
+        }
         const events = await evRes.json();
         const users = await (await fetch("/api/admin/users", { headers: H() })).json().catch(() => []);
         document.getElementById("usersWrap").innerHTML = users.length
