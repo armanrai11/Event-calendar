@@ -1,6 +1,6 @@
 # Event Calendar 
 
-An interactive event calendar website with a **3D look**, a **Node.js + Express backend**,
+An interactive event calendar website with  a **Node.js + Express backend**,
 **MongoDB database**, and **full CRUD operations**.
 
 ## Team
